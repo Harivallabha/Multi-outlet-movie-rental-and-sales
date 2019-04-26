@@ -2,7 +2,7 @@ import java.sql.Date;
 
 public class Customer {
 
-    String cust_id,cust_siteid,cust_name,cust_surname,cust_idno,cust_address,cust_cellno,cust_telno,cust_email;
+    String cust_id,cust_siteid,cust_name,cust_surname,cust_idno,cust_address,cust_telno,cust_cellno,cust_email;
 
     Date dob;
 
@@ -11,14 +11,18 @@ public class Customer {
         this.cust_id=id;
         this.cust_siteid=site_id;
     }
-    Customer()
+    Customer(String name,String surname,Date dob,String idno,String address,String telno,String cellno,String email)
     {
-
+        this.cust_name=name;
     }
 
-    public boolean Check_Credentials(String name,String surname,Date dob,String idno,String address,String telno,String cellno,String)
+    public boolean Check_Credentials()
     {
         System.out.println("hey");
+    }
+    public void Add_Customer()
+    {
+
     }
 
 

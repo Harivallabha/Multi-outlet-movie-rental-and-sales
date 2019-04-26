@@ -18,17 +18,13 @@ import javafx.util.Callback;
 import javafx.scene.control.PasswordField;
 
 public class trialgui extends Application{
-    public String CUSTOMER_ID=null;
-    public String CUSTOMER_SITEID=null;
-    public String EMPLOYEE_ID=null;
-    public String EMPLOYEE_SITEID=null;
-    public String EMPLOYEE_PASSWORD=null;
+    Customer cust = null;
     Employee emp=null;
     public String Name=new String();
     public Stage window=new Stage();
-    public static void main()
+    public static void main(String[] args)
     {
-
+        launch(args);
     }
 
     @Override
@@ -58,11 +54,18 @@ public class trialgui extends Application{
         Button Proceed = new Button("Proceed");
         Proceed.setOnAction(e->
         {
-            EMPLOYEE_ID=Employee_id.getText();
-            EMPLOYEE_SITEID=Employee_site_id.getText();
-            EMPLOYEE_PASSWORD=password.getText();
-            emp=new Employee();
-            System.out.println(CUSTOMER_ID+ " " + CUSTOMER_SITEID+" "+EMPLOYEE_ID+" "+EMPLOYEE_SITEID+" "+EMPLOYEE_PASSWORD);
+            emp=new Employee(Employee_id.getText(),Employee_site_id.getText());
+            if(!emp.Check_credentials())
+            {
+                AlertBox.display("Error","Invalid Credentials!");
+                window.setScene(scene);
+                emp=null;
+            }
+            else
+            {
+                Customer_page();
+            }
+          //  System.out.println(CUSTOMER_ID+ " " + CUSTOMER_SITEID+" "+EMPLOYEE_ID+" "+EMPLOYEE_SITEID+" "+EMPLOYEE_PASSWORD);
 
 
 
@@ -89,12 +92,31 @@ public class trialgui extends Application{
         GridPane g = new GridPane();
         TextField t1 = new TextField("Name");
         TextField t2 = new TextField("Sur-Name");
-        TextField t3 = new TextField("Date of Birth");
+        DatePicker t3 = new DatePicker();
+        t3.setValue(LocalDate.now());
+        final Callback<DatePicker, DateCell> dayCellFactory =
+                new Callback<DatePicker, DateCell>() {
+                    @Override
+                    public DateCell call(final DatePicker datePicker) {
+                        return new DateCell() {
+                            @Override
+                            public void updateItem(LocalDate item, boolean empty) {
+                                super.updateItem(item, empty);
+
+                                if (item.isAfter(LocalDate.now()))
+                                {
+                                    setDisable(true);
+                                    setStyle("-fx-background-color: #ffc0cb;");
+                                }
+                            }
+                        };
+                    }
+                };
+        t3.setDayCellFactory(dayCellFactory);
         TextField t4 = new TextField("IDno");
         TextField t5 = new TextField("Address");
         TextField t6 = new TextField("TelNo");
         TextField t7 = new TextField("Cell No");
-        TextField t8 = new TextField("TelNo");
         TextField t9 = new TextField("Email");
         Label l1= new Label("Name");
         Label l2= new Label("Sur-Name");
@@ -103,7 +125,6 @@ public class trialgui extends Application{
         Label l5 = new Label("Address");
         Label l6 = new Label("TelNo");
         Label l7 = new Label("Cell No");
-        Label l8 = new Label("TelNo");
         Label l9 = new Label("Email");
         g.add(t1,2,1);
         g.add(t2,2,2);
@@ -112,8 +133,7 @@ public class trialgui extends Application{
         g.add(t5,2,5);
         g.add(t6,2,6);
         g.add(t7,2,7);
-        g.add(t8,2,8);
-        g.add(t9,2,9);
+        g.add(t9,2,8);
         g.add(l1,1,1);
         g.add(l2,1,2);
         g.add(l3,1,3);
@@ -121,10 +141,17 @@ public class trialgui extends Application{
         g.add(l5,1,5);
         g.add(l6,1,6);
         g.add(l7,1,7);
-        g.add(l8,1,8);
-        g.add(l9,1,9);
+        //g.add(l8,1,8);
+        g.add(l9,1,8);
         Button b= new Button("Confirm");
-        //b.setOnAction(e->);
+        b.setOnAction(e->
+        {
+            Date date = Date.from(t3.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
+            java.sql.Date date1= new java.sql.Date(date.getTime());
+            cust=new Customer(t1.getText(),t2.getText(),date1,
+                    t4.getText(),t5.getText(),t6.getText(),t7.getText(),t9.getText());
+            Service_page();
+        });
         Scene s= new Scene(g,600,800);
         window.setScene(s);
     }
@@ -143,8 +170,16 @@ public class trialgui extends Application{
         Button proceed=new Button("Proceed");
         proceed.setOnAction(e->
         {
-            CUSTOMER_ID=customer_id.getText();
-            CUSTOMER_SITEID=cust_site_id.getText();
+            cust=new Customer(Cust_id.getText(),Cust_site_id.getText());
+            if(!cust.Check_Credentials())
+            {
+                AlertBox.display("Error","Invalid Customer Credentials!");
+                window.setScene(scene);
+                cust=null;
+            }
+            else{
+                Service_page();
+            }
             //write a function to connect to database in order to verify validity of customer
         });
         layout.add(customer_id,1,1);
@@ -161,7 +196,17 @@ public class trialgui extends Application{
         Scene scene = new Scene(g,300,300);
         c.getItems().addAll("Transactions","Buy");
         Button p = new Button();
-        //p.setOnAction(e->);
+        p.setOnAction(e->
+        {
+            if(c.getValue().equals("Transactions"))
+            {
+                Rent_Transaction_History();
+            }
+            else if(c.getValue().equals("Buy"))
+            {
+                Sell_Transaction_History();
+            }
+        });
         g.add(l,1,1);
         g.add(c,2,1);
         g.add(p,2,2);
@@ -173,14 +218,14 @@ public class trialgui extends Application{
 
         VBox v= new VBox();
         TableView<Rent_Item> table= new TableView<>();
-        Button delete = new Button("Delete");
+        //Button delete = new Button("Delete");
         Button add = new Button("Add");
         HBox hbox =new HBox();
-        hbox.getChildren().addAll(add,delete);
+        hbox.getChildren().addAll(add);
         v.getChildren().addAll(table,hbox);
 
-        add.setOnAction(e->);
-        delete.setOnAction(e->);
+        add.setOnAction(e->Add_rent_item(table));
+        //delete.setOnAction(e->);
 
 
 
@@ -217,23 +262,33 @@ public class trialgui extends Application{
         Column7.setCellValueFactory(new PropertyValueFactory<>("cost"));
 
         table.getColumns().addAll(Column1,Column8,Column4,Column5,Column6,Column2,Column3,Column7);
-        ObservableList<Rent_Item> list = FXCollections.observableArrayList();
+        table.setItems(get_Rent_Items());
 
 
 
         Scene s = new Scene(v,1600,1000);
         window.setScene(s);
     }
+
+    public ObservableList<Rent_Item> get_Rent_Items()
+    {
+        ObservableList<Rent_Item> items = FXCollections.observableArrayList();
+        return items;
+
+    }
+
     public void Sell_Transaction_History()
     {
         TableView<Sell_item> table= new TableView<>();
         VBox v= new VBox();
         HBox h = new HBox();
         Button add = new Button("Add");
-        Button delete = new Button("Delete");
+        h.getChildren().add(add);
+        //Button delete = new Button("Delete");
         v.getChildren().addAll(table,h);
-        add.setOnAction();
-        delete.setOnAction();
+        add.setOnAction(e->{Add_sell_item();});
+        //delete.setOnAction(e->{});
+        Scene s =new Scene(v,1600,1600);
 
 
         TableColumn<Sell_item, String> Column1 = new TableColumn<>("Transaction Id");
@@ -267,5 +322,99 @@ public class trialgui extends Application{
 
         table.getColumns().addAll(Column1,Column8,Column4,Column5,Column6,Column2,Column7);
         ObservableList<Rent_Item> list = FXCollections.observableArrayList();
+        window.setScene(s);
+    }
+
+    public void Add_rent_item(TableView<Rent_Item> table)
+    {
+        ObservableList<Rent_Item> list = FXCollections.observableArrayList();
+
+        TableView<Available_Movies> table1= new TableView<>();
+        VBox v= new VBox();
+        HBox h = new HBox();
+        Button add = new Button("Add");
+        add.setOnAction(e->
+        {
+            ObservableList<Available_Movies> list1 = FXCollections.observableArrayList();
+            list1=table1.getSelectionModel().getSelectedItems();
+            //here write a function call that can creates new rent_item entries corresponding to movr_is and site_id
+        });
+        h.getChildren().add(add);
+        v.getChildren().addAll(table,add);
+        Scene s= new Scene(v,1600,1600);
+
+        TableColumn<Available_Movies, String> Column1 = new TableColumn<>("Movie Id");
+        Column1.setMinWidth(200);
+        Column1.setCellValueFactory(new PropertyValueFactory<>("movr_id"));
+
+        TableColumn<Available_Movies, String> Column2 = new TableColumn<>("Movie site Id");
+        Column2.setMinWidth(200);
+        Column2.setCellValueFactory(new PropertyValueFactory<>("movr_site_id"));
+
+        TableColumn<Available_Movies, String> Column3 = new TableColumn<>("Movie Name");
+        Column1.setMinWidth(200);
+        Column1.setCellValueFactory(new PropertyValueFactory<>("movr_name"));
+
+        TableColumn<Available_Movies, String> Column4 = new TableColumn<>("Movie Type");
+        Column1.setMinWidth(200);
+        Column1.setCellValueFactory(new PropertyValueFactory<>("movr_type"));
+        table1.getColumns().addAll(Column1,Column2,Column3,Column4);
+        window.setScene(s);
+
+    }
+    public void Add_sell_item()
+    {
+        TableView<Movie_Sell> table= new TableView<>();
+        VBox v= new VBox();
+        HBox h = new HBox();
+        v.getChildren().addAll(table,h);
+        Button sell = new Button("Sell");
+        sell.setOnAction(e->
+        {
+            Sell_movie();
+        });
+        Scene s= new Scene(v,1600,1000);
+
+        TableColumn<Movie_Sell, String> Column1 = new TableColumn<>("Movie Id");
+        Column1.setMinWidth(200);
+        Column1.setCellValueFactory(new PropertyValueFactory<>("movs_id"));
+
+        TableColumn<Movie_Sell, String> Column2 = new TableColumn<>("Movie site Id");
+        Column2.setMinWidth(200);
+        Column2.setCellValueFactory(new PropertyValueFactory<>("movs_site_id"));
+
+        TableColumn<Movie_Sell, String> Column3 = new TableColumn<>("Movie Name");
+        Column1.setMinWidth(200);
+        Column1.setCellValueFactory(new PropertyValueFactory<>("movs_name"));
+
+        TableColumn<Movie_Sell, String> Column4 = new TableColumn<>("Movie Type");
+        Column1.setMinWidth(200);
+        Column1.setCellValueFactory(new PropertyValueFactory<>("movs_type"));
+
+        TableColumn<Movie_Sell, String> Column5 = new TableColumn<>("Actor1");
+        Column1.setMinWidth(200);
+        Column1.setCellValueFactory(new PropertyValueFactory<>("movs_actor1"));
+
+        TableColumn<Movie_Sell, String> Column6 = new TableColumn<>("Actor2");
+        Column1.setMinWidth(200);
+        Column1.setCellValueFactory(new PropertyValueFactory<>("movs_actor2"));
+
+        TableColumn<Movie_Sell, String> Column7 = new TableColumn<>("Actor3");
+        Column1.setMinWidth(200);
+        Column1.setCellValueFactory(new PropertyValueFactory<>("movs_actor3"));
+
+        TableColumn<Movie_Sell, String> Column8 = new TableColumn<>("Stock ID");
+        Column1.setMinWidth(200);
+        Column1.setCellValueFactory(new PropertyValueFactory<>("stk_id"));
+
+
+        table.getColumns().addAll(Column1,Column2,Column3,Column4,Column5,Column6,Column7,Column8);
+        window.setScene(s);
+
+    }
+
+    public boolean Sell_movie()
+    {
+        
     }
 }
