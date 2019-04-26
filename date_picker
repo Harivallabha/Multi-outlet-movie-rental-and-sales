@@ -1,0 +1,21 @@
+DatePicker DOB = new DatePicker();
+        DOB.setValue(LocalDate.now());
+        final Callback<DatePicker, DateCell> dayCellFactory =
+                new Callback<DatePicker, DateCell>() {
+            @Override
+            public DateCell call(final DatePicker datePicker) {
+                return new DateCell() {
+                    @Override
+                    public void updateItem(LocalDate item, boolean empty) {
+                        super.updateItem(item, empty);
+
+                        if (item.isAfter(LocalDate.now()))
+                        {
+                            setDisable(true);
+                            setStyle("-fx-background-color: #ffc0cb;");
+                        }
+                    }
+                };
+            }
+        };
+        DOB.setDayCellFactory(dayCellFactory);
