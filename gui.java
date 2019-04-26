@@ -8,7 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.scene.control.PasswordField;
@@ -18,21 +18,23 @@ import javafx.scene.control.PasswordField;
 
 
 class gui extends Application{
-    public Stage window = new Stage();
-    public String EMPLOYEE_ID=null;
-    public String EMPLOYEE_SITEID=null;
-    public String CUSTOMER=null;
-    public static void main(String[] args) {launch(args);
+    Stage window = new Stage();
+    String EMPLOYEE_ID=null;
+    String EMPLOYEE_SITEID=null;
+    String CUSTOMER_ID=null;
+    String CUSTOMER_SITEID=null;
 
+    public static void main(String[] args) {
+        launch(args);
     }
     @Override
     public void start(Stage window) throws Exception
     {
-        WelcomePage();
+        employee_customer_service();
     }
 
 
-    public void WelcomePage()
+   /* public void WelcomePage()
     {
         TextField Message = new TextField("The credentials you entered are incorrect kindly enter the correct credentials and try again");
         Button register;
@@ -141,15 +143,15 @@ class gui extends Application{
         {
 
         });*/
-    }
+
     public void employee_customer_service()
-    /*find out if an employee of a certain site can serve a customer of another
-            site.*/
     {
         GridPane layout=new GridPane();
         Scene scene = new Scene(layout,600,400);
         Label employee_id = new Label("Employee ID");
         Label employee_site_id=new Label("Employee Site ID");
+        Label employee_password = new Label("Employee Password");
+        PasswordField password = new PasswordField();
         TextField Employee_id=new TextField();
         TextField Employee_site_id=new TextField();
         Label Service = new Label("Choose the service");
@@ -160,17 +162,16 @@ class gui extends Application{
         Cust_id.setPromptText("Enter the universal customer id");
         Cust_site_id.setPromptText("Enter the Site Id of registration");
         ChoiceBox<String> choiceBox = new ChoiceBox<>();
-        choiceBox.getItems().add("Rent out");
-        choiceBox.getItems().add("Rent in");
         choiceBox.getItems().add("Sell");
-        choiceBox.getItems().add("Get Transactions");
+        choiceBox.getItems().add("Active Transactions");
         Button Proceed = new Button("Proceed");
         Proceed.setOnAction(e->
         {
-            CUSTOMER= Cust_id.getText();
+            CUSTOMER_ID= Cust_id.getText();
+            CUSTOMER_SITEID=Cust_site_id.getText();
             EMPLOYEE_ID=Employee_id.getText();
             EMPLOYEE_SITEID=employee_site_id.getText();
-            switch(choiceBox.getValue())
+            /*switch(choiceBox.getValue())
             {
                 case "Rent in":
                     Rent_in();
@@ -181,31 +182,34 @@ class gui extends Application{
                     Sell();
                 case "Get Transactions":
                     Get_Transactions();
-            }
+            }*/
 
         });
-        layout.setPadding( new Insets(15,15,15,15));
+        layout.setPadding(new Insets(15,15,15,15));
         layout.setHgap(10);
         layout.setVgap(10);
         layout.add(employee_id,1,1);
-        layout.add(employee_site_id,3,1);
+        layout.add(employee_site_id,1,2);
         layout.add(Employee_id,2,1);
-        layout.add(Employee_site_id,4,1);
-        layout.add(Service,1,4);
-        layout.add(Cust_id,2,1);
-        layout.add(Cust_site_id,3,2);
-        layout.add(customer_id,1,2);
-        layout.add(cust_site_id,1,3);
-        layout.add(choiceBox,2,4);
+        layout.add(Employee_site_id,2,2);
+        layout.add(Service,1,5);
+        layout.add(Cust_id,2,3);
+        layout.add(Cust_site_id,2,4);
+        layout.add(customer_id,1,3);
+        layout.add(cust_site_id,1,4);
+        layout.add(choiceBox,2,5);
+        layout.add(employee_password,1,6);
+        layout.add(password,2,6);
         window.setScene(scene);
+        window.show();
 
-    }
-    public void Rent_in()
+    }/*
+    public void Rent_out()
     {
         GridPane layout = new GridPane();
+        Scene scene = new Scene(layout,1000,600);
         Label Options = new Label("Available Options:");
-        String[] movies;
-        movies = ;
+        String[] movies=new String[]{"yeh jawani hai deewani","Avengers-Endgame","Captain Marvel"};
         Hyperlink[] hl = new Hyperlink[100];
         for(int i=0;movies[i]!=null;i++)
         {
@@ -213,25 +217,34 @@ class gui extends Application{
             layout.add(hl[i],1,i+2);
             hl[i].setOnAction(e->Get_Transactions());
         }
-        Scene scene = new Scene(layout,600,400);Button Logout = new Button("Logout");
+        //Scene scene = new Scene(layout,600,400);
+        Button Logout = new Button("Logout");
         Logout.setOnAction(e->{
             EMPLOYEE_ID=null;
             EMPLOYEE_SITEID=null;
-            loginpagemethod();
+            CUSTOMER_ID=null;
+            CUSTOMER_SITEID=null;
+            employee_customer_service();
         });
         layout.add(Logout,10,1);
-
+        layout.add(Options,1,1);
+        //layout.add();
+        window.setScene(scene);
     }
-    public void Rent_out()
+    public void Rent_in()
     {
         GridPane layout = new GridPane();
         Scene scene = new Scene(layout,600,400);
         Button Logout = new Button("Logout");
         Logout.setOnAction(e->{
-            EMPLOYEE=null;
-            loginpagemethod();
+            EMPLOYEE_ID=null;
+            EMPLOYEE_SITEID=null;
+            CUSTOMER_SITEID=null;
+            CUSTOMER_ID=null;
+            employee_customer_service();
         });
         layout.add(Logout,10,1);
+        window.setScene(scene);
     }
     public void Sell()
     {
@@ -239,8 +252,11 @@ class gui extends Application{
         Scene scene = new Scene(layout,600,400);
         Button Logout = new Button("Logout");
         Logout.setOnAction(e->{
-            EMPLOYEE=null;
-            loginpagemethod();
+            EMPLOYEE_ID=null;
+            EMPLOYEE_SITEID=null;
+            CUSTOMER_ID=null;
+            CUSTOMER_SITEID=null;
+            employee_customer_service();
         });
         layout.add(Logout,10,1);
     }
@@ -250,10 +266,13 @@ class gui extends Application{
         Scene scene = new Scene(layout,600,400);
         Button Logout = new Button("Logout");
         Logout.setOnAction(e->{
-            EMPLOYEE=null;
-            loginpagemethod();
+            EMPLOYEE_ID=null;
+            EMPLOYEE_SITEID=null;
+            CUSTOMER_ID=null;
+            CUSTOMER_SITEID=null;
+            employee_customer_service();
         });
         layout.add(Logout,10,1);
-    }
+    }*/
 
 }
