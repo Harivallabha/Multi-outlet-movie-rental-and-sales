@@ -1,3 +1,4 @@
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
@@ -22,10 +23,10 @@ public class trialgui extends Application{
     Employee emp=null;
     public String Name=new String();
     public Stage window=new Stage();
-    public static void main(String[] args)
+    /*public static void main(String[] args)
     {
         launch(args);
-    }
+    }*/
 
     @Override
     public void start(Stage window) throws Exception
@@ -38,23 +39,19 @@ public class trialgui extends Application{
         GridPane layout=new GridPane();
         Scene scene = new Scene(layout,600,400);
         Label employee_id = new Label("Employee ID");
+        Button ac=new Button("Add customer");
+        ac.setOnAction(e->Add_Customer());
         Label employee_site_id=new Label("Employee Site ID");
         Label employee_password = new Label("Employee Password");
         PasswordField password = new PasswordField();
         TextField Employee_id=new TextField();
         TextField Employee_site_id=new TextField();
-        Label Service = new Label("Choose the service");
-        TextField Cust_id = new TextField();
-        TextField Cust_site_id = new TextField();
-        Cust_id.setPromptText("Enter the universal customer id");
-        Cust_site_id.setPromptText("Enter the Site Id of registration");
-        ChoiceBox<String> choiceBox = new ChoiceBox<>();
-        choiceBox.getItems().add("Sell");
-        choiceBox.getItems().add("Active Transactions");
         Button Proceed = new Button("Proceed");
+
         Proceed.setOnAction(e->
         {
             emp=new Employee(Employee_id.getText(),Employee_site_id.getText());
+            emp.emp_password=password.getText();
             if(!emp.Check_credentials())
             {
                 AlertBox.display("Error","Invalid Credentials!");
@@ -77,10 +74,6 @@ public class trialgui extends Application{
         layout.add(employee_site_id,1,2);
         layout.add(Employee_id,2,1);
         layout.add(Employee_site_id,2,2);
-        layout.add(Service,1,5);
-        layout.add(Cust_id,2,3);
-        layout.add(Cust_site_id,2,4);
-        layout.add(choiceBox,2,5);
         layout.add(employee_password,1,6);
         layout.add(password,2,6);
         layout.add(Proceed,2,7);
@@ -150,8 +143,13 @@ public class trialgui extends Application{
             java.sql.Date date1= new java.sql.Date(date.getTime());
             cust=new Customer(t1.getText(),t2.getText(),date1,
                     t4.getText(),t5.getText(),t6.getText(),t7.getText(),t9.getText());
+
             Service_page();
         });
+        g.setPadding(new Insets(25,25,25,25));
+        g.setHgap(10);
+        g.setVgap(10);
+        g.add(b,1,8);
         Scene s= new Scene(g,600,800);
         window.setScene(s);
     }
@@ -182,10 +180,14 @@ public class trialgui extends Application{
             }
             //write a function to connect to database in order to verify validity of customer
         });
+        layout.setPadding(new Insets(15,15,15,15));
+        layout.setHgap(10);
+        layout.setVgap(10);
         layout.add(customer_id,1,1);
         layout.add(cust_site_id,1,2);
         layout.add(Cust_id,2,1);
         layout.add(Cust_site_id,2,2);
+        layout.add(proceed,2,3);
         window.setScene(scene);
     }
     public void Service_page()
@@ -193,38 +195,145 @@ public class trialgui extends Application{
         Label l=new Label("Choose the service");
         ChoiceBox<String> c = new ChoiceBox<>();
         GridPane g = new GridPane();
-        Scene scene = new Scene(g,300,300);
+        Scene scene = new Scene(g,600,400);
         c.getItems().addAll("Transactions","Buy");
-        Button p = new Button();
+        Button p = new Button("Proceed");
         p.setOnAction(e->
         {
             if(c.getValue().equals("Transactions"))
             {
-                Rent_Transaction_History();
+                Intermidiate_page();
+                //Rent_Transaction_History();
             }
             else if(c.getValue().equals("Buy"))
             {
                 Sell_Transaction_History();
             }
         });
+        g.setPadding(new Insets(15,15,15,15));
+        g.setHgap(10);
+        g.setVgap(10);
         g.add(l,1,1);
         g.add(c,2,1);
         g.add(p,2,2);
-        g.add(c,1,3);
+        //g.add(c,1,3);
         window.setScene(scene);
     }
-    public void Rent_Transaction_History()
+    public void Intermidiate_page() {
+        Label l1 = new Label("Choose Start Date");
+
+        Label l2 = new Label("Choose End Date");
+
+        //ChoiceBox<String> c = new ChoiceBox<>();
+        GridPane g = new GridPane();
+        Scene scene = new Scene(g, 600, 400);
+        //c.getItems().addAll("Transactions", "Buy");
+
+
+        DatePicker start_date = new DatePicker();
+
+        final Callback<DatePicker, DateCell> dayCellFactory =
+                new Callback<DatePicker, DateCell>() {
+                    @Override
+                    public DateCell call(final DatePicker datePicker) {
+                        return new DateCell() {
+                            @Override
+                            public void updateItem(LocalDate item, boolean empty) {
+                                super.updateItem(item, empty);
+
+                                if (item.isAfter(LocalDate.now()))
+                                {
+                                    setDisable(true);
+                                    setStyle("-fx-background-color: #ffc0cb;");
+                                }
+                            }
+                        };
+                    }
+                };
+        start_date.setValue(LocalDate.now());
+        start_date.setDayCellFactory(dayCellFactory);
+        DatePicker end_date = new DatePicker();
+
+        final Callback<DatePicker, DateCell> dayCellFactory1 =
+                new Callback<DatePicker, DateCell>() {
+                    @Override
+                    public DateCell call(final DatePicker datePicker) {
+                        return new DateCell() {
+                            @Override
+                            public void updateItem(LocalDate item, boolean empty) {
+                                super.updateItem(item, empty);
+
+                                if (item.isBefore(start_date.getValue()))
+                                {
+                                    //setDisable(true);
+                                    setStyle("-fx-background-color: #ffc0cb;");
+                                }
+                            }
+                        };
+                    }
+                };
+        end_date.setDayCellFactory(dayCellFactory1);
+
+        Button p = new Button("Proceed");
+        p.setOnAction(e ->
+        {
+            //if (c.getValue().equals("Transactions")) {
+
+            //Rent_Transaction_History();
+            //} else if (c.getValue().equals("Buy")) {
+            //  Sell_Transaction_History();
+            LocalDate d=start_date.getValue();
+            LocalDate d1=end_date.getValue();
+            java.sql.Date s_date= new java.sql.Date((givesdate(d)).getTime());
+            java.sql.Date s1_date= new java.sql.Date((givesdate(d)).getTime());
+            Rent_Transaction_History(s_date,s1_date);
+
+            // }
+        });
+        g.setPadding(new Insets(25,25,25,25));
+        g.setHgap(20);
+        g.setVgap(20);
+        g.add(l1, 1, 1);
+        g.add(l2, 1, 2);
+        g.add(start_date,2,1);
+        g.add(end_date,2,2);
+        //g.add(c, 2, 1);
+        g.add(p, 2, 3);
+        //g.add(c,1,3);
+        window.setScene(scene);
+
+    }
+
+
+
+    public static Date givesdate(LocalDate l)
+    {
+        Date d = null;
+        d = java.util.Date.from(l.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+        System.out.println(d);
+        return d;
+    }
+
+    public void Rent_Transaction_History(java.sql.Date x1, java.sql.Date x2)
     {
 
         VBox v= new VBox();
         TableView<Rent_Item> table= new TableView<>();
         //Button delete = new Button("Delete");
+        try{
+        table.setItems(new solution2().callOracleStoredProcCURSORParameter(x1,x2));}
+        catch (SQLException e)
+        {
+            System.out.println(e);
+        }
         Button add = new Button("Add");
         HBox hbox =new HBox();
         hbox.getChildren().addAll(add);
+        hbox.setPadding(new Insets(25,25,25,25));
         v.getChildren().addAll(table,hbox);
+        v.setPadding(new Insets(25,25,25,25));
+        add.setOnAction(e->Add_rent_item());
 
-        add.setOnAction(e->Add_rent_item(table));
         //delete.setOnAction(e->);
 
 
@@ -262,7 +371,7 @@ public class trialgui extends Application{
         Column7.setCellValueFactory(new PropertyValueFactory<>("cost"));
 
         table.getColumns().addAll(Column1,Column8,Column4,Column5,Column6,Column2,Column3,Column7);
-        table.setItems(get_Rent_Items());
+
 
 
 
@@ -325,23 +434,44 @@ public class trialgui extends Application{
         window.setScene(s);
     }
 
-    public void Add_rent_item(TableView<Rent_Item> table)
+    public void Add_rent_item()
     {
-        ObservableList<Rent_Item> list = FXCollections.observableArrayList();
+        ObservableList<Available_Movies> list = FXCollections.observableArrayList();
 
         TableView<Available_Movies> table1= new TableView<>();
+
+        Available_Movies test = new Available_Movies();
+        //test.movr_reg_siteid="why do this to me?";
+        //test.movr_name="why do this to me?";
+        //test.movr_id="why do this to me?";test.movr_type="why do this to me?";
+
+        //System.out.println(test.movr_reg_siteid);
+
+
+      try{
+            list = new solution3().callOracleStoredProcCURSORParameter();
+            //System.out.print(list);
+            //list.add(new Available_Movies());
+           table1.setItems(list);
+        }
+        catch(SQLException e){System.out.println(e);}
+
         VBox v= new VBox();
         HBox h = new HBox();
+        //h.setPadding(new Insets(10,10,10,10));
+        //h.setSpacing(10);
         Button add = new Button("Add");
-        add.setOnAction(e->
+        /*add.setOnAction(e->
         {
-            ObservableList<Available_Movies> list1 = FXCollections.observableArrayList();
+            ObservableList<Available_Movies> list1=FXCollections.observableArrayList();
             list1=table1.getSelectionModel().getSelectedItems();
+            Intermidiate_page();
             //here write a function call that can creates new rent_item entries corresponding to movr_is and site_id
-        });
+        });*/
         h.getChildren().add(add);
-        v.getChildren().addAll(table,add);
-        Scene s= new Scene(v,1600,1600);
+        v.getChildren().addAll(table1,h);
+        Scene s= new Scene(v,1600,600);
+        //Scene s= new Scene(v);
 
         TableColumn<Available_Movies, String> Column1 = new TableColumn<>("Movie Id");
         Column1.setMinWidth(200);
@@ -349,16 +479,27 @@ public class trialgui extends Application{
 
         TableColumn<Available_Movies, String> Column2 = new TableColumn<>("Movie site Id");
         Column2.setMinWidth(200);
-        Column2.setCellValueFactory(new PropertyValueFactory<>("movr_site_id"));
+        Column2.setCellValueFactory(new PropertyValueFactory<>("movr_reg_siteid"));
 
         TableColumn<Available_Movies, String> Column3 = new TableColumn<>("Movie Name");
-        Column1.setMinWidth(200);
-        Column1.setCellValueFactory(new PropertyValueFactory<>("movr_name"));
+        Column3.setMinWidth(200);
+        Column3.setCellValueFactory(new PropertyValueFactory<>("movr_name"));
 
         TableColumn<Available_Movies, String> Column4 = new TableColumn<>("Movie Type");
-        Column1.setMinWidth(200);
-        Column1.setCellValueFactory(new PropertyValueFactory<>("movr_type"));
-        table1.getColumns().addAll(Column1,Column2,Column3,Column4);
+        Column4.setMinWidth(200);
+        Column4.setCellValueFactory(new PropertyValueFactory<>("movr_type"));
+
+        table1.getColumns().addAll(Column1,Column3,Column4,Column2);
+        test.setMovr_id("what");
+        test.setMovr_name("why");
+        test.setMovr_reg_siteid("How");
+        test.setMovr_type("when");
+        table1.getItems().add(test);
+
+
+
+
+        //table1.setItems(list);
         window.setScene(s);
 
     }
@@ -369,10 +510,10 @@ public class trialgui extends Application{
         HBox h = new HBox();
         v.getChildren().addAll(table,h);
         Button sell = new Button("Sell");
-        sell.setOnAction(e->
-        {
-            Sell_movie();
-        });
+       // sell.setOnAction(e->
+        //{
+         //   Sell_movie();
+        //});
         Scene s= new Scene(v,1600,1000);
 
         TableColumn<Movie_Sell, String> Column1 = new TableColumn<>("Movie Id");
@@ -413,8 +554,5 @@ public class trialgui extends Application{
 
     }
 
-    public boolean Sell_movie()
-    {
-        
-    }
+
 }
