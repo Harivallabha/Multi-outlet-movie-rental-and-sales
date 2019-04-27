@@ -1,31 +1,55 @@
-import javafx.collections.ObservableList;
-
 public class Available_Movies {
-    String movr_id,movr_name,movr_type,movr_reg_siteid;
 
-    Available_Movies()
-    {
-        movr_id = "TEST";
-        movr_name = "TEST";
-        movr_type = "TEST";
-        movr_reg_siteid = "TEST";
+    private String movr_id;
+    private String movr_name;
+    private String movr_type;
+    private String movr_reg_siteid;
 
-
+    public Available_Movies(){
+        this.movr_id = "";
+        this.movr_name = "";
+        this.movr_type = "";
+        this.movr_reg_siteid="";
     }
 
-    public void setMovr_id(String movr_id) {
-        this.movr_id = movr_id;
+    public Available_Movies(String name, String price, String quantity,String test){
+        this.movr_id = name;
+        this.movr_name = price;
+        this.movr_type = quantity;
+        this.movr_reg_siteid=test;
     }
 
-    public void setMovr_name(String movr_name) {
-        this.movr_name = movr_name;
+    public String getMovr_id() {
+        return movr_id;
     }
 
-    public void setMovr_reg_siteid(String w) {
-        this.movr_reg_siteid=w;
+    public void setMovr_id(String name) {
+        this.movr_id = name;
     }
 
-    public void setMovr_type(String movr_type) {
-        this.movr_type = movr_type;
+    public String getMovr_name() {
+        return movr_name;
     }
+
+    public void setMovr_name(String name) {
+        this.movr_name = name;
+    }
+
+    public String getMovr_type() {
+        return movr_type;
+    }
+
+    public void setMovr_type(String name) {
+        this.movr_type = name;
+    }
+
+    public String getMovr_reg_siteid() {
+        return movr_reg_siteid;
+    }
+
+    public void setMovr_reg_siteid(String name) {
+        this.movr_reg_siteid = name;
+    }
+
 }
+
