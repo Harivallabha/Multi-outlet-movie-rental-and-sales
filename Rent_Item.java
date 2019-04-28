@@ -8,10 +8,42 @@ public class Rent_Item{
     String movr_reg_siteid;
     String movr_name;
     String renttxn_site_id;
-    String emp_id,emp_name,emp_siteid,cost;
+    String emp_id,emp_name,emp_siteid,cost,remp_id,remp_siteid,rcust_id,rcust_siteid;
 
     public Date getRent_date() {
         return rent_date;
+    }
+
+    public String getRcust_id() {
+        return rcust_id;
+    }
+
+    public String getRcust_siteid() {
+        return rcust_siteid;
+    }
+
+    public void setRcust_id(String rcust_id) {
+        this.rcust_id = rcust_id;
+    }
+
+    public void setRcust_siteid(String rcust_siteid) {
+        this.rcust_siteid = rcust_siteid;
+    }
+
+    public String getRemp_id() {
+        return remp_id;
+    }
+
+    public String getRemp_siteid() {
+        return remp_siteid;
+    }
+
+    public void setRemp_id(String remp_id) {
+        this.remp_id = remp_id;
+    }
+
+    public void setRemp_siteid(String remp_siteid) {
+        this.remp_siteid = remp_siteid;
     }
 
     public String getCost() {
